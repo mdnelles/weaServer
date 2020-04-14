@@ -31,8 +31,8 @@ cities.post('/get_cities', rf.verifyToken, (req, res) => {
             req.headers.referer,
             tdate
          );
-         res.json({ error: 'CityRoutes > login error-> ' + err });
-         console.log({ error: 'CityRoutes > login error-> ' + err });
+         res.json({ error: 'CityRoutes > get_cities error-> ' + err });
+         console.log({ error: 'CityRoutes > get_cities error-> ' + err });
       });
 });
 
