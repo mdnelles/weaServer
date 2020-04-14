@@ -51,4 +51,3 @@ importcsv.get('/csv', (req, res) => {
 });
 
 module.exports = importcsv;
-`

@@ -46,7 +46,7 @@ const tokenTest = (token, res, jwt, caller, next) => {
                token
          );
          // this will send forbidden 403 response
-         res.sendStatus(403);
+         res.send('not logged in');
       } else {
          Logfn.log2db(
             200,
@@ -64,7 +64,7 @@ const tokenTest = (token, res, jwt, caller, next) => {
    });
 };
 
-exports.verifyToken = function(req, res, next) {
+exports.verifyToken = function (req, res, next) {
    if (req.body.token !== undefined) {
       var caller = '';
       if (req.body.caller !== undefined) caller = req.body.caller;
