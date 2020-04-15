@@ -1,8 +1,6 @@
 const express = require('express'),
    cities = express.Router(),
    cors = require('cors'),
-   jwt = require('jsonwebtoken'),
-   bcrypt = require('bcrypt'),
    Cities = require('../models/Cities'),
    Logfn = require('../components/Logger'),
    rf = require('./RoutFuctions');
