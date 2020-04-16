@@ -1,0 +1,80 @@
+<html>
+   <head>
+      <script>
+         // this is iterative
+         function doOneSpot() {
+            var alpha1 = [
+               "a",
+               "b",
+               "c",
+               "d",
+               "e",
+               "f",
+               "g",
+               "h",
+               "i",
+               "j",
+               "k",
+               "l",
+               "m",
+               "n",
+               "o",
+               "p",
+               "q",
+               "r",
+               "s",
+               "t",
+               "u",
+               "v",
+               "w",
+               "x",
+               "y",
+               "z",
+            ]; //alphabet array 1
+            var alpha2 = alpha1; // alpa index
+
+            alpha1.forEach((e, index) => {
+               var i2 = 0;
+               doTwoLetterCities(alpha1, alpha2, index, i2);
+            });
+         }
+         // this is recursive
+         function doTwoLetterCities(alpha1, alpha2, i1, i2) {
+            console.log(alpha1[i1], alpha2[i2]);
+            i2++;
+            if (i2 < alpha2.length) {
+               doTwoLetterCities(alpha1, alpha2, i1, i2);
+            }
+         }
+
+         function slowFunction() {
+            return new Promise((resolve) => {
+               setTimeout(() => {
+                  console.log("next step resolve");
+                  resolve(true);
+               }, 2000);
+            });
+         }
+
+         async function waitingFunction() {
+            console.log("async function called\n...2 sec delay.");
+            let temp = await slowFunction();
+            console.log("parameter passed = " + temp);
+         }
+      </script>
+      <style>
+         body {
+            background-color: #000;
+         }
+      </style>
+   </head>
+   <body>
+      <button onclick="doOneSpot()">
+         GO
+      </button>
+
+      <button onclick="waitingFunction()">
+         GO
+      </button>
+   </body>
+</html>

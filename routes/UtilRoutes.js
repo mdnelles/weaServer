@@ -59,4 +59,64 @@ utils.post("/gen_json", rf.verifyToken, (req, res) => {
       });
 });
 
+utils.post("/gen_json_by_alpha", rf.verifyToken, (req, res) => {});
+
+function doOneSpot() {
+   var alpha1 = [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "q",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z",
+   ]; //alphabet array 1
+   var alpha2 = alpha1; // alpa index
+
+   alpha1.forEach((e, index) => {
+      var i2 = 0;
+      doTwoLetterCities(alpha1, alpha2, index, i2);
+   });
+}
+// this is recursive
+function doTwoLetterCities(alpha1, alpha2, i1, i2) {
+   db.sequelize
+      .query(
+         " SELECT city,country FROM cities WHERE city like '" + alpha1[i1],
+         alpha2[i2] + "%' ORDER BY country,city ASC ",
+         {
+            type: Sequelize.QueryTypes.SELECT,
+         }
+      )
+      .then(() => {
+         console.log("completed: " + alpha1[i1], alpha2[i2]);
+         i2++;
+         if (i2 < alpha2.length) {
+            doTwoLetterCities(alpha1, alpha2, i1, i2);
+         }
+      })
+      .catch((err) => {
+         console.log("Err@ UtilRoutes.doTwoLetterCities: " + err);
+      });
+}
+
 module.exports = utils;
