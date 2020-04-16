@@ -11,6 +11,35 @@ const express = require("express"),
 
 utils.use(cors());
 
+const alpha = [
+   "a",
+   "b",
+   "c",
+   "d",
+   "e",
+   "f",
+   "g",
+   "h",
+   "i",
+   "j",
+   "k",
+   "l",
+   "m",
+   "n",
+   "o",
+   "p",
+   "q",
+   "r",
+   "s",
+   "t",
+   "u",
+   "v",
+   "w",
+   "x",
+   "y",
+   "z",
+]; //alphabet array 1
+
 utils.post("/gen_json", rf.verifyToken, (req, res) => {
    db.sequelize
       .query("SELECT city,country FROM cities ORDER BY city ASC ", {
@@ -59,64 +88,54 @@ utils.post("/gen_json", rf.verifyToken, (req, res) => {
       });
 });
 
-utils.post("/gen_json_by_alpha", rf.verifyToken, (req, res) => {});
+utils.post("/gen_json_by_alpha", rf.verifyToken, (req, res) => {
+   // STEP 1
+   let refer = req.headers.referer + "-".toString();
+   console.log("\n\n\n" + refer + "\n\n\n");
+   let finalResponse = initSteps(refer);
+   console.log("final Respnse returned: " + finalResponse);
+   res.send("ok");
+});
 
-function doOneSpot() {
-   var alpha1 = [
-      "a",
-      "b",
-      "c",
-      "d",
-      "e",
-      "f",
-      "g",
-      "h",
-      "i",
-      "j",
-      "k",
-      "l",
-      "m",
-      "n",
-      "o",
-      "p",
-      "q",
-      "r",
-      "s",
-      "t",
-      "u",
-      "v",
-      "w",
-      "x",
-      "y",
-      "z",
-   ]; //alphabet array 1
-   var alpha2 = alpha1; // alpa index
-
-   alpha1.forEach((e, index) => {
+////////////////////////////////////////////// js functions (no server calls)
+// STEP 2
+const initSteps = async function (refer) {
+   alpha.forEach((e, index) => {
       var i2 = 0;
-      doTwoLetterCities(alpha1, alpha2, index, i2);
+      let t = doTwoLetterCities(alpha, index, i2, refer);
+      //let temp = await slowFunction();
    });
-}
-// this is recursive
-function doTwoLetterCities(alpha1, alpha2, i1, i2) {
+   return 1;
+};
+
+// Step 3 this is recursive
+const doTwoLetterCities = function (alpha, i1, i2, refer) {
    db.sequelize
       .query(
-         " SELECT city,country FROM cities WHERE city like '" + alpha1[i1],
-         alpha2[i2] + "%' ORDER BY country,city ASC ",
+         `SELECT city,country FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' ORDER BY country,city ASC `,
          {
             type: Sequelize.QueryTypes.SELECT,
          }
       )
-      .then(() => {
-         console.log("completed: " + alpha1[i1], alpha2[i2]);
-         i2++;
-         if (i2 < alpha2.length) {
-            doTwoLetterCities(alpha1, alpha2, i1, i2);
-         }
+      .then((data) => {
+         let path,
+            fileName = alpha[i1] + alpha[i2] + ".txt";
+
+         // establish file path based on weather or not it is production or build
+         refer.includes("localhost:")
+            ? (path = "../client/public/share/")
+            : (path = "../client/build/share/");
+         fs.outputJson(path + fileName, data).then((res) => {
+            console.log("completed: " + fileName);
+            i2++;
+            if (i2 < alpha.length) {
+               doTwoLetterCities(alpha, i1, i2, refer);
+            }
+         });
       })
       .catch((err) => {
          console.log("Err@ UtilRoutes.doTwoLetterCities: " + err);
       });
-}
+};
 
 module.exports = utils;
