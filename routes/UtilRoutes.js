@@ -11,28 +11,34 @@ const express = require('express'),
 
 utils.use(cors());
 
-function write2File(filePath, contents) {
-   return new Promise((resolve, reject) => {
-      fs.writeFile(filePath, contents);
-   });
-}
-
-async function asyncCall(filePath, contents, res) {
-   console.log(`calling`);
-   var result = await write2File(filePath, contents);
-   console.log(result);
-   res.send(result);
-}
-
 utils.post('/gen_json', rf.verifyToken, (req, res) => {
-   // display path of file
-   console.log('inside gen_json');
    Cities.findAll({ limit: 2 })
       .then((cities) => {
-         //console.log(cities);
-         //res.send(cities);
-         let filePath = '../xxxxxxxxxxxxx.json'; //client/public/share/cities.json';
-         asyncCall(filePath, cities, res);
+         let file,
+            r = req.headers.referer + '-'.toString();
+
+         // establish file path based on weather or not it is production or build
+         r.includes('localhost:')
+            ? (file = '../client/public/share/cities.json')
+            : (file = '../client/build/share/cities.json');
+         fs.outputJSON(file, cities)
+            .then(() => {
+               res.json({ success: 'UtilRoutes.gen_json' });
+            })
+            .catch((err) => {
+               console.error(err);
+               Logfn.log2db(
+                  500,
+                  fileName,
+                  'UtilRoutes.gen_json',
+                  'catch',
+                  err,
+                  ip,
+                  req.headers.referer,
+                  tdate
+               );
+               res.json({ error: 'UtilRoutes.gen_json error-> ' + err });
+            });
       })
       .catch((err) => {
          Logfn.log2db(
