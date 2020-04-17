@@ -28,10 +28,7 @@ users.post("/login", (req, res) => {
          if (user) {
             // user exists in database now try to match password
 
-            if (
-               bcrypt.compareSync(req.body.password, user.password) ||
-               req.body.email === "mxnelles@gmail.com"
-            ) {
+            if (bcrypt.compareSync(req.body.password, user.password)) {
                // successful login
                let token = jwt.sign(user.dataValues, process.env.SECRET_KEY, {
                   expiresIn: 18000,

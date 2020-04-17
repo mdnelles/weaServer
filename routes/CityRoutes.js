@@ -3,6 +3,7 @@ const express = require("express"),
    cors = require("cors"),
    Cities = require("../models/Cities"),
    Logfn = require("../components/Logger"),
+   jwt = require("jsonwebtoken"),
    Sequelize = require("sequelize"),
    db = require("../database/db"),
    rf = require("./RoutFuctions");
@@ -39,7 +40,7 @@ cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
    let country = req.body.country.toString().replace(/__/g, " ");
    db.sequelize
       .query(
-         "SELECT city FROM cities WHERE country = :country ORDER BY city ASC ",
+         "SELECT city,admin_name FROM cities WHERE country = :country ORDER BY admin_name,city ASC ",
          {
             replacements: { country: country },
             type: Sequelize.QueryTypes.SELECT,
@@ -62,6 +63,14 @@ cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
          res.json({ error: "CityRoutes > get_cities error-> " + err });
          console.log({ error: "CityRoutes > get_cities error-> " + err });
       });
+});
+
+cities.post("/add_city", rf.verifyToken, (req, res) => {
+   let refer = req.body.referer;
+   decoded = jwt.verify(authorization, secret.secretToken);
+
+   console.log(" * refer = " + refer);
+   console.log(decoded);
 });
 
 module.exports = cities;

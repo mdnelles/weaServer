@@ -42,7 +42,7 @@ const alpha = [
 
 utils.post("/gen_json", rf.verifyToken, (req, res) => {
    db.sequelize
-      .query("SELECT city,country FROM cities ORDER BY city ASC ", {
+      .query("SELECT city,admin_name,country FROM cities ORDER BY city ASC ", {
          type: Sequelize.QueryTypes.SELECT,
       })
       .then((cities) => {
@@ -111,7 +111,7 @@ const initSteps = async function (refer) {
 const doTwoLetterCities = function (alpha, i1, i2, refer) {
    db.sequelize
       .query(
-         `SELECT city,country FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' ORDER BY country,city ASC `,
+         `SELECT city,admin_name,country FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' ORDER BY country,city ASC `,
          {
             type: Sequelize.QueryTypes.SELECT,
          }
