@@ -67,10 +67,13 @@ cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
 
 cities.post("/add_city", rf.verifyToken, (req, res) => {
    let refer = req.body.referer;
-   decoded = jwt.verify(authorization, secret.secretToken);
+   // jwt.verify(token, process.env.SECRET_KEY, (err) => {
+   decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
 
    console.log(" * refer = " + refer);
    console.log(decoded);
+   console.log(req.body.data);
+   res.send("ok");
 });
 
 module.exports = cities;
