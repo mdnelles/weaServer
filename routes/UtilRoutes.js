@@ -91,7 +91,6 @@ utils.post("/gen_json", rf.verifyToken, (req, res) => {
 utils.post("/gen_json_by_alpha", rf.verifyToken, (req, res) => {
    // STEP 1
    let refer = req.headers.referer + "-".toString();
-   console.log("\n\n\n" + refer + "\n\n\n");
    let finalResponse = initSteps(refer);
    console.log("final Respnse returned: " + finalResponse);
    res.send("ok");
@@ -126,7 +125,7 @@ const doTwoLetterCities = function (alpha, i1, i2, refer) {
             ? (path = "../client/public/share/")
             : (path = "../client/build/share/");
          fs.outputJson(path + fileName, data).then((res) => {
-            console.log("completed: " + fileName);
+            //console.log("completed: " + fileName);
             i2++;
             if (i2 < alpha.length) {
                doTwoLetterCities(alpha, i1, i2, refer);
@@ -135,6 +134,16 @@ const doTwoLetterCities = function (alpha, i1, i2, refer) {
       })
       .catch((err) => {
          console.log("Err@ UtilRoutes.doTwoLetterCities: " + err);
+         Logfn.log2db(
+            500,
+            fileName,
+            "UtilRoutes.doTwoLetterCities",
+            "catch",
+            err,
+            ip,
+            refer,
+            tdate
+         );
       });
 };
 
