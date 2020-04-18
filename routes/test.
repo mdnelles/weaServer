@@ -1,0 +1,6 @@
+const fileger = require(“fileger”)
+const file = new fileger.File(“./your-file-path.txt”);
+file.encrypt(“your-password”) // this will encrypt the file
+.then(() => {
+file.decrypt(“your-password”) // this will decrypt the file
+})
