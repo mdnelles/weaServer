@@ -111,7 +111,7 @@ const initSteps = async function (refer) {
 const doTwoLetterCities = function (alpha, i1, i2, refer) {
    db.sequelize
       .query(
-         `SELECT city,admin_name,country FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' ORDER BY country,city ASC `,
+         `SELECT city as c,admin_name as p,iso2 as o FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' ORDER BY country,city ASC `,
          {
             type: Sequelize.QueryTypes.SELECT,
          }
