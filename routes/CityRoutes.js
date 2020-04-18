@@ -4,6 +4,7 @@ const express = require("express"),
    Cities = require("../models/Cities"),
    Logfn = require("../components/Logger"),
    jwt = require("jsonwebtoken"),
+   uuid = require("uuid"),
    Sequelize = require("sequelize"),
    db = require("../database/db"),
    rf = require("./RoutFuctions");
@@ -66,14 +67,62 @@ cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
 });
 
 cities.post("/add_city", rf.verifyToken, (req, res) => {
-   let refer = req.body.referer;
+   let refer = req.headers.referer;
    // jwt.verify(token, process.env.SECRET_KEY, (err) => {
    decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
 
-   console.log(" * refer = " + refer);
-   console.log(decoded);
-   console.log(req.body.data);
-   res.send("ok");
+   if (
+      decoded.email !== "demo" ||
+      (refer !== undefined && refer.includes("http://localhost:"))
+   ) {
+      let uuid1 = uuid.v1();
+      Cities.create({
+         city: req.body.data.city,
+         city_ascii: req.body.data.city,
+         admin_name: req.body.data.admin_name,
+         country: req.body.data.country,
+         population: req.body.data.population,
+         lng: req.body.data.lng,
+         lat: req.body.data.lat,
+         iso3: req.body.data.iso3,
+         id: uuid1,
+      }).then(function (users) {
+         res.send(uuid1);
+      });
+   } else {
+      res.send("non persistant");
+   }
+});
+
+cities.post("/edit_city", rf.verifyToken, (req, res) => {
+   let refer = req.headers.referer;
+   // jwt.verify(token, process.env.SECRET_KEY, (err) => {
+   decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
+
+   if (
+      decoded.email !== "demo" ||
+      (refer !== undefined && refer.includes("http://localhost:"))
+   ) {
+      if (req.body.data.id !== undefined)
+         Cities.update(
+            {
+               city: req.body.data.city,
+               admin_name: req.body.data.admin_name,
+               country: req.body.data.country,
+               population: req.body.data.population,
+               lng: req.body.data.lng,
+               lat: req.body.data.lat,
+               iso3: req.body.data.iso3,
+               id: req.body.data.id,
+            },
+            { where: { id: req.body.data.id } },
+            { limit: 1 }
+         ).then(function (users) {
+            res.send("persistant addition");
+         });
+   } else {
+      res.send("non persistant");
+   }
 });
 
 module.exports = cities;
