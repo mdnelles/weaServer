@@ -42,14 +42,17 @@ const alpha = [
 
 utils.post("/gen_json", rf.verifyToken, (req, res) => {
    db.sequelize
-      .query("SELECT city,admin_name,country FROM cities ORDER BY city ASC ", {
-         type: Sequelize.QueryTypes.SELECT,
-      })
+      .query(
+         "SELECT city_ascii,admin_name,country FROM cities ORDER BY city ASC ",
+         {
+            type: Sequelize.QueryTypes.SELECT,
+         }
+      )
       .then((cities) => {
          let file,
             r = req.headers.referer + "-".toString();
 
-         // establish file path based on weather or not it is production or build
+         // establish file path based on weather or not it is production or dev
          r.includes("localhost:")
             ? (file = "../client/public/share/cities.json")
             : (file = "../client/build/share/cities.json");
@@ -111,26 +114,46 @@ const initSteps = async function (refer) {
 const doTwoLetterCities = function (alpha, i1, i2, refer) {
    db.sequelize
       .query(
-         `SELECT city as c,ANY_VALUE(admin_name) as p, ANY_VALUE(iso2) as o, ANY_VALUE(population) as n FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' GROUP BY c,p ORDER BY o,p,c ASC`,
+         `SELECT city_ascii as c,ANY_VALUE(admin_name) as p, ANY_VALUE(iso2) as o, ANY_VALUE(population) as n FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' GROUP BY c,p ORDER BY o,p,c ASC`,
          {
             type: Sequelize.QueryTypes.SELECT,
          }
       )
       .then((data) => {
-         let path,
-            fileName = alpha[i1] + alpha[i2] + ".txt";
+         // need to remove accents from letters
+         if (data !== undefined || data.length > 0) {
+            data.forEach((e, i) => {
+               if (data[i].c !== undefined) {
+                  data[i].c = data[i].c
+                     .normalize("NFD")
+                     .replace(/[\u0300-\u036f]/g, "");
+               }
+               if (data[i].p !== undefined) {
+                  data[i].p = data[i].p
+                     .normalize("NFD")
+                     .replace(/[\u0300-\u036f]/g, "");
+               }
+               if (data[i].o !== undefined) {
+                  data[i].o = data[i].o
+                     .normalize("NFD")
+                     .replace(/[\u0300-\u036f]/g, "");
+               }
+            });
+            let path,
+               fileName = alpha[i1] + alpha[i2] + ".txt";
 
-         // establish file path based on weather or not it is production or build
-         refer.includes("localhost:")
-            ? (path = "../client/public/share/")
-            : (path = "../client/build/share/");
-         fs.outputJson(path + fileName, data).then((res) => {
-            //console.log("completed: " + fileName);
-            i2++;
-            if (i2 < alpha.length) {
-               doTwoLetterCities(alpha, i1, i2, refer);
-            }
-         });
+            // establish file path based on weather or not it is production or build
+            refer.includes("localhost:")
+               ? (path = "../client/public/share/")
+               : (path = "../client/build/share/");
+            fs.outputJson(path + fileName, data).then((res) => {
+               //console.log("completed: " + fileName);
+               i2++;
+               if (i2 < alpha.length) {
+                  doTwoLetterCities(alpha, i1, i2, refer);
+               }
+            });
+         }
       })
       .catch((err) => {
          console.log("Err@ UtilRoutes.doTwoLetterCities: " + err);
