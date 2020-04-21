@@ -1,7 +1,9 @@
 const express = require("express"),
    cities = express.Router(),
    cors = require("cors"),
+   axios = require("axios"),
    Cities = require("../models/Cities"),
+   ApiData = require("../models/ApiData"),
    Logfn = require("../components/Logger"),
    jwt = require("jsonwebtoken"),
    uuid = require("uuid"),
@@ -124,5 +126,60 @@ cities.post("/edit_city", rf.verifyToken, (req, res) => {
       res.send("non persistant");
    }
 });
+
+cities.post("/get_api", rf.verifyToken, (req, res) => {
+   let cityID = req.body.data.id;
+   console.log(cityID);
+   ApiData.findAll({ where: { city_id: cityID } })
+      .then((aData) => {
+         console.log("** length = " + aData.length);
+         if (aData.length !== 0) {
+            let j = JSON.parse(aData.stringified);
+            res.send(aData);
+         } else {
+            res.send("need to make API call");
+         }
+
+         //res.send(cities);
+      })
+      .catch((err) => {
+         Logfn.log2db(
+            500,
+            fileName,
+            "could not get cities",
+            "catch err",
+            err,
+            ip,
+            req.headers.referer,
+            tdate
+         );
+         res.json({ error: "CityRoutes > get_cities error-> " + err });
+         console.log({ error: "CityRoutes > get_cities error-> " + err });
+      });
+});
+
+const apiFetch = (lon, lat) => {
+   axios({
+      method: "GET",
+      url: "https://dark-sky.p.rapidapi.com/" + lon + "," + lat,
+      headers: {
+         "content-type": "application/octet-stream",
+         "x-rapidapi-host": "dark-sky.p.rapidapi.com",
+         "x-rapidapi-key": c.global.darkAPIKey,
+      },
+      params: {
+         lang: "en",
+         units: "auto",
+      },
+   })
+      .then((response) => {
+         res.send(stringify(response));
+         console.log(response);
+      })
+      .catch((error) => {
+         res.send(stringify(error));
+         console.log(error);
+      });
+};
 
 module.exports = cities;

@@ -41,6 +41,7 @@ var Import = require("./routes/ImportRoutes.js"),
    City = require("./routes/CityRoutes"),
    Country = require("./routes/CountryRoutes"),
    Utils = require("./routes/UtilRoutes"),
+   Api = require("./routes/ApiRoutes"),
    Logs = require("./routes/LogRoutes");
 
 app.use("/import", Import);
@@ -48,6 +49,7 @@ app.use("/user", User);
 app.use("/logs", Logs);
 app.use("/city", City);
 app.use("/utils", Utils);
+app.use("/api", Api);
 app.use("/country", Country);
 // serve static assets if in production
 if (process.env.NODE_ENV === "production") {

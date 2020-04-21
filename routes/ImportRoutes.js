@@ -97,19 +97,6 @@ importcsv.get("/csv2", (req, res) => {
                         id = '${uuid1}'
                         `;
 
-                     /*
-                     sql = `INSERT IGNORE INTO cities  (
-                                    '${city}',
-                                    '${city}',
-                                    '${lat}',
-                                    '${lng}',
-                                    'Canada',
-                                    'CA',
-                                    'CAN',
-                                    'Ottawa',
-                                    '34000000',
-                                    'uuid',
-                                    )`;*/
                      if (five) console.log(sql);
                      if (count > 5) {
                         five = false;
@@ -133,6 +120,23 @@ importcsv.get("/csv2", (req, res) => {
    }
 
    startStream2(uuid);
+});
+
+importcsv.get("/countries_array", (req, res) => {
+   db.sequelize
+      .query(
+         `SELECT ANY_VALUE(country) as cou,ANY_VALUE(iso2) as iso FROM cities GROUP BY country`,
+         {
+            type: Sequelize.QueryTypes.SELECT,
+         }
+      )
+      .then((data) => {
+         let outp = "";
+         data.forEach((e, i) => {
+            //outp = data[i].c}
+         });
+         res.send(data);
+      });
 });
 
 module.exports = importcsv;
