@@ -139,4 +139,118 @@ importcsv.get("/countries_array", (req, res) => {
       });
 });
 
+// weather bit cities import
+importcsv.get("/csv_cities_wb", (req, res) => {
+   ////////
+
+   let five = true;
+   var sql,
+      sqls,
+      city_id,
+      city,
+      city_ascii,
+      state_code,
+      country_code,
+      country_full,
+      lat,
+      lng,
+      count = 0;
+   var stream = byline(
+      fs.createReadStream("../_files/cities_20000_wb.csv", {
+         encoding: "utf8",
+      })
+   );
+
+   stream
+      .on("data", function (line, err) {
+         if (line !== undefined) {
+            if (line !== undefined && line.length > 2) {
+               temp = line.toString().split(",");
+               if (temp[1] !== undefined) {
+                  city_id = temp[0];
+                  city_name = temp[1];
+                  city_ascii = temp[1]
+                     .normalize("NFD")
+                     .replace(/[\u0300-\u036f]/g, "");
+                  state_code = temp[2];
+                  country_code = temp[3];
+                  country_full = temp[4];
+                  lat = temp[5];
+                  lon = temp[6];
+                  //console.log(city + ", " + province);
+                  //sql = "INSERT INTO cities VALUES (" + line.toString() + ");";
+                  sql = `INSERT IGNORE INTO wb_cities SET
+                        city_id= '${city_id}',
+                        city_name = '${city_name}',
+                        city_ascii = '${city_ascii}',
+                        state_code = '${state_code}',
+                        country_code = '${country_code}',
+                        country_full = '${country_full}',
+                        lat= '${lat}',
+                        lon= '${lon}'
+                           `;
+
+                  if (five) console.log(sql);
+                  if (count > 5) {
+                     five = false;
+                  }
+                  count++;
+                  db.sequelize.query(sql);
+               }
+            }
+         }
+      })
+      .on("finish", () => {
+         console.log("all done");
+         res.send("ok");
+      });
+});
+
+importcsv.get("/csv_states_wb", (req, res) => {
+   ////////
+
+   var sql,
+      state_code,
+      state_name,
+      state_name_ascii,
+      country_code,
+      count = 0;
+   var stream = byline(
+      fs.createReadStream("../_files/states_wb.csv", {
+         encoding: "utf8",
+      })
+   );
+
+   stream
+      .on("data", function (line, err) {
+         if (line !== undefined && line.length > 2) {
+            line = line.replace(/"/g, "");
+            temp = line.toString().split(",");
+            if (temp[1] !== undefined && temp[1].length > 1) {
+               state_code = temp[0];
+               state_name = temp[1];
+               state_name_ascii = temp[1]
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "");
+               country_code = temp[2];
+               sql = `INSERT IGNORE INTO wb_states SET
+                        id = '${count}',
+                        state_code = '${state_code}',
+                        state_name = '${state_name}',
+                        state_name_ascii = '${state_name_ascii}',
+                        country_code = '${country_code}'
+                           `;
+               // Error Code: 1054. Unknown column 'id' in 'field list'
+
+               count++;
+               db.sequelize.query(sql);
+            }
+         }
+      })
+      .on("finish", () => {
+         console.log("all done");
+         res.send("ok");
+      });
+});
+
 module.exports = importcsv;
