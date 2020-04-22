@@ -115,14 +115,21 @@ const initSteps = async function (refer) {
 const doTwoLetterCities = function (alpha, i1, i2, refer) {
    db.sequelize
       .query(
-         `SELECT city_ascii as c,ANY_VALUE(admin_name) as p, ANY_VALUE(iso2) as o, ANY_VALUE(population) as n FROM cities WHERE city like '${alpha[i1]}${alpha[i2]}%' GROUP BY c,p ORDER BY o,p,c ASC`,
+         `SELECT ANY_VALUE(wb_cities.city_id) as id, 
+         ANY_VALUE(wb_cities.city_ascii) as c,
+         ANY_VALUE(wb_cities.state_code) as p, 
+         ANY_VALUE(wb_cities.country_code) as o
+         FROM wb_cities
+           WHERE wb_cities.city_ascii like  '${alpha[i1]}${alpha[i2]}%'  ORDER BY o,p,c ASC`,
          {
             type: Sequelize.QueryTypes.SELECT,
          }
       )
       .then((data) => {
          // need to remove accents from letters
+
          if (data !== undefined || data.length > 0) {
+            /*
             data.forEach((e, i) => {
                if (data[i].c !== undefined) {
                   data[i].c = data[i].c
@@ -139,7 +146,7 @@ const doTwoLetterCities = function (alpha, i1, i2, refer) {
                      .normalize("NFD")
                      .replace(/[\u0300-\u036f]/g, "");
                }
-            });
+            });*/
             let path,
                fileName = alpha[i1] + alpha[i2] + ".txt";
 

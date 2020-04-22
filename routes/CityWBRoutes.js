@@ -1,29 +1,8 @@
-/*
-
-
-
-
-
-
-!!!!!!!
-
-
-Moved to weather bit so please use CityWBRoutes 
-
-
-
-!!!!!!!
-
-
-
-
-*/
-
 const express = require("express"),
    cities = express.Router(),
    cors = require("cors"),
    axios = require("axios"),
-   Cities = require("../models/Cities"),
+   CitiesWB = require("../models/CitiesWB"),
    ApiData = require("../models/ApiData"),
    Logfn = require("../components/Logger"),
    jwt = require("jsonwebtoken"),
@@ -40,7 +19,7 @@ let fileName = __filename.split(/[\\/]/).pop();
 
 cities.post("/get_cities", rf.verifyToken, (req, res) => {
    // display path of file
-   Cities.findAll()
+   CitiesWB.findAll()
       .then((cities) => {
          res.send(cities);
       })
@@ -99,7 +78,7 @@ cities.post("/add_city", rf.verifyToken, (req, res) => {
       (refer !== undefined && refer.includes("http://localhost:"))
    ) {
       let uuid1 = uuid.v1();
-      Cities.create({
+      CitiesWB.create({
          city: req.body.data.city,
          city_ascii: req.body.data.city,
          admin_name: req.body.data.admin_name,
@@ -127,7 +106,7 @@ cities.post("/edit_city", rf.verifyToken, (req, res) => {
       (refer !== undefined && refer.includes("http://localhost:"))
    ) {
       if (req.body.data.id !== undefined)
-         Cities.update(
+         CitiesWB.update(
             {
                city: req.body.data.city,
                admin_name: req.body.data.admin_name,

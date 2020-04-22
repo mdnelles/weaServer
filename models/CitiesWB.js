@@ -1,72 +1,47 @@
-/*
-
-
-
-No longer in use
-
-
-
-*/
-
 const Sequelize = require("sequelize");
 const db = require("../database/db.js");
 
 module.exports = db.sequelize.define(
-   "citiesDEPERECIATED",
+   "wb_citie",
    {
-      city: {
+      city_id: {
+         type: Sequelize.INTEGER,
+         primaryKey: true,
+         allowNull: false,
+      },
+      city_name: {
          type: Sequelize.STRING,
          defaultValue: "na",
-         allowNull: false,
+         allowNull: true,
       },
       city_ascii: {
          type: Sequelize.STRING,
          defaultValue: "na",
          allowNull: false,
       },
+      state_code: {
+         type: Sequelize.STRING,
+         defaultValue: "na",
+         allowNull: true,
+      },
+      country_code: {
+         type: Sequelize.STRING,
+         defaultValue: "na",
+         allowNull: true,
+      },
+      country_full: {
+         type: Sequelize.STRING,
+         defaultValue: "na",
+         allowNull: true,
+      },
       lat: {
          type: Sequelize.STRING,
          defaultValue: "na",
          allowNull: false,
       },
-      lng: {
+      lon: {
          type: Sequelize.STRING,
          defaultValue: "na",
-         allowNull: false,
-      },
-      country: {
-         type: Sequelize.STRING,
-         defaultValue: "na",
-         allowNull: false,
-      },
-      iso2: {
-         type: Sequelize.STRING,
-         defaultValue: "na",
-         allowNull: false,
-      },
-      iso3: {
-         type: Sequelize.STRING,
-         defaultValue: "na",
-         allowNull: false,
-      },
-      admin_name: {
-         type: Sequelize.STRING,
-         defaultValue: "na",
-         allowNull: false,
-      },
-      capital: {
-         type: Sequelize.STRING,
-         defaultValue: "na",
-         allowNull: false,
-      },
-      population: {
-         type: Sequelize.STRING,
-         defaultValue: "na",
-         allowNull: false,
-      },
-      id: {
-         type: Sequelize.INTEGER,
-         primaryKey: true,
          allowNull: false,
       },
    },

@@ -1,29 +1,8 @@
-/*
-
-
-
-
-
-
-!!!!!!!
-
-
-Moved to weather bit so please use CityWBRoutes 
-
-
-
-!!!!!!!
-
-
-
-
-*/
-
 const express = require("express"),
-   cities = express.Router(),
+   states = express.Router(),
    cors = require("cors"),
    axios = require("axios"),
-   Cities = require("../models/Cities"),
+   StatesWB = require("../models/StatesWB"),
    ApiData = require("../models/ApiData"),
    Logfn = require("../components/Logger"),
    jwt = require("jsonwebtoken"),
@@ -32,39 +11,39 @@ const express = require("express"),
    db = require("../database/db"),
    rf = require("./RoutFuctions");
 
-cities.use(cors());
+states.use(cors());
 
 let ip = "0.0.0.0"; // install ip tracker
 let tdate = Logfn.get_date();
 let fileName = __filename.split(/[\\/]/).pop();
 
-cities.post("/get_cities", rf.verifyToken, (req, res) => {
+states.post("/get_states", rf.verifyToken, (req, res) => {
    // display path of file
-   Cities.findAll()
-      .then((cities) => {
-         res.send(cities);
+   StatesWB.findAll()
+      .then((states) => {
+         res.send(states);
       })
       .catch((err) => {
          Logfn.log2db(
             500,
             fileName,
-            "could not get cities",
+            "could not get states",
             "catch err",
             err,
             ip,
             req.headers.referer,
             tdate
          );
-         res.json({ error: "CityRoutes > get_cities error-> " + err });
-         console.log({ error: "CityRoutes > get_cities error-> " + err });
+         res.json({ error: "StateWBRoutes > get_states error-> " + err });
+         console.log({ error: "StateWBRoutes > get_states error-> " + err });
       });
 });
 
-cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
+states.post("/get_states_by_country", rf.verifyToken, (req, res) => {
    let country = req.body.country.toString().replace(/__/g, " ");
    db.sequelize
       .query(
-         "SELECT city,admin_name FROM cities WHERE country = :country ORDER BY admin_name,city ASC ",
+         "SELECT state,admin_name FROM states WHERE country = :country ORDER BY admin_name,state ASC ",
          {
             replacements: { country: country },
             type: Sequelize.QueryTypes.SELECT,
@@ -77,19 +56,19 @@ cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
          Logfn.log2db(
             500,
             fileName,
-            "could not get cities",
+            "could not get states",
             "catch err",
             err,
             ip,
             req.headers.referer,
             tdate
          );
-         res.json({ error: "CityRoutes > get_cities error-> " + err });
-         console.log({ error: "CityRoutes > get_cities error-> " + err });
+         res.json({ error: "StateWBRoutes > get_states error-> " + err });
+         console.log({ error: "StateWBRoutes > get_states error-> " + err });
       });
 });
 
-cities.post("/add_city", rf.verifyToken, (req, res) => {
+states.post("/add_state", rf.verifyToken, (req, res) => {
    let refer = req.headers.referer;
    // jwt.verify(token, process.env.SECRET_KEY, (err) => {
    decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
@@ -99,9 +78,9 @@ cities.post("/add_city", rf.verifyToken, (req, res) => {
       (refer !== undefined && refer.includes("http://localhost:"))
    ) {
       let uuid1 = uuid.v1();
-      Cities.create({
-         city: req.body.data.city,
-         city_ascii: req.body.data.city,
+      StatesWB.create({
+         state: req.body.data.state,
+         state_ascii: req.body.data.state,
          admin_name: req.body.data.admin_name,
          country: req.body.data.country,
          population: req.body.data.population,
@@ -117,7 +96,7 @@ cities.post("/add_city", rf.verifyToken, (req, res) => {
    }
 });
 
-cities.post("/edit_city", rf.verifyToken, (req, res) => {
+states.post("/edit_state", rf.verifyToken, (req, res) => {
    let refer = req.headers.referer;
    // jwt.verify(token, process.env.SECRET_KEY, (err) => {
    decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
@@ -127,9 +106,9 @@ cities.post("/edit_city", rf.verifyToken, (req, res) => {
       (refer !== undefined && refer.includes("http://localhost:"))
    ) {
       if (req.body.data.id !== undefined)
-         Cities.update(
+         StatesWB.update(
             {
-               city: req.body.data.city,
+               state: req.body.data.state,
                admin_name: req.body.data.admin_name,
                country: req.body.data.country,
                population: req.body.data.population,
@@ -148,10 +127,10 @@ cities.post("/edit_city", rf.verifyToken, (req, res) => {
    }
 });
 
-cities.post("/get_api", rf.verifyToken, (req, res) => {
-   let cityID = req.body.data.id;
-   console.log(cityID);
-   ApiData.findAll({ where: { city_id: cityID } })
+states.post("/get_api", rf.verifyToken, (req, res) => {
+   let stateID = req.body.data.id;
+   console.log(stateID);
+   ApiData.findAll({ where: { state_id: stateID } })
       .then((aData) => {
          console.log("** length = " + aData.length);
          if (aData.length !== 0) {
@@ -161,21 +140,21 @@ cities.post("/get_api", rf.verifyToken, (req, res) => {
             res.send("need to make API call");
          }
 
-         //res.send(cities);
+         //res.send(states);
       })
       .catch((err) => {
          Logfn.log2db(
             500,
             fileName,
-            "could not get cities",
+            "could not get states",
             "catch err",
             err,
             ip,
             req.headers.referer,
             tdate
          );
-         res.json({ error: "CityRoutes > get_cities error-> " + err });
-         console.log({ error: "CityRoutes > get_cities error-> " + err });
+         res.json({ error: "StateWBRoutes > get_states error-> " + err });
+         console.log({ error: "StateWBRoutes > get_states error-> " + err });
       });
 });
 
@@ -203,4 +182,4 @@ const apiFetch = (lon, lat) => {
       });
 };
 
-module.exports = cities;
+module.exports = states;

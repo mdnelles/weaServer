@@ -38,7 +38,8 @@ app.use(
 
 var Import = require("./routes/ImportRoutes.js"),
    User = require("./routes/UserRoutes"),
-   City = require("./routes/CityRoutes"),
+   CityWB = require("./routes/CityWBRoutes"),
+   StateWB = require("./routes/StateWBRoutes"),
    Country = require("./routes/CountryRoutes"),
    Utils = require("./routes/UtilRoutes"),
    Api = require("./routes/ApiRoutes"),
@@ -47,7 +48,8 @@ var Import = require("./routes/ImportRoutes.js"),
 app.use("/import", Import);
 app.use("/user", User);
 app.use("/logs", Logs);
-app.use("/city", City);
+app.use("/citywb", CityWB);
+app.use("/statewb", StateWB);
 app.use("/utils", Utils);
 app.use("/api", Api);
 app.use("/country", Country);
