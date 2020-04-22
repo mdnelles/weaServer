@@ -24,6 +24,11 @@ module.exports = db.sequelize.define(
          defaultValue: "na",
          allowNull: true,
       },
+      state_name_ascii: {
+         type: Sequelize.STRING,
+         defaultValue: "na",
+         allowNull: true,
+      },
       country_code: {
          type: Sequelize.STRING,
          defaultValue: "na",

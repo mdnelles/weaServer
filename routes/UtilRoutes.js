@@ -117,7 +117,7 @@ const doTwoLetterCities = function (alpha, i1, i2, refer) {
       .query(
          `SELECT ANY_VALUE(wb_cities.city_id) as id, 
          ANY_VALUE(wb_cities.city_ascii) as c,
-         ANY_VALUE(wb_cities.state_code) as p, 
+         ANY_VALUE(wb_cities.state_name_ascii) as p, 
          ANY_VALUE(wb_cities.country_code) as o
          FROM wb_cities
            WHERE wb_cities.city_ascii like  '${alpha[i1]}${alpha[i2]}%'  ORDER BY o,p,c ASC`,

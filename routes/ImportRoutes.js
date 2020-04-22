@@ -4,6 +4,7 @@ const express = require("express"),
    byline = require("byline"),
    db = require("../database/db"),
    importcsv = express.Router(),
+   StatesWB = require("../models/StatesWB"),
    rf = require("./RoutFuctions"),
    uuid = require("uuid"),
    Sequelize = require("sequelize");
@@ -139,6 +140,27 @@ importcsv.get("/countries_array", (req, res) => {
       });
 });
 
+//                  db.sequelize.query(sql);
+importcsv.get("/seed_provinces", (req, res) => {
+   let upd,
+      get =
+         "SELECT id,state_code,state_name_ascii,country_code FROM wb_states ";
+   StatesWB.findAll().then((data) => {
+      //res.send("ok"); //JSON.stringify(data));
+      data.forEach((e, i) => {
+         upd += ` 
+            UPDATE wb_cities SET state_name_ascii='${e.state_name_ascii}' 
+               WHERE country_code='${e.country_code}'
+               AND state_code='${e.state_code}'; 
+         `;
+
+         //console.log(upd);
+      });
+      setTimeout(() => {
+         res.send("clear"); //upd);
+      }, 10000);
+   });
+});
 // weather bit cities import
 importcsv.get("/csv_cities_wb", (req, res) => {
    ////////
