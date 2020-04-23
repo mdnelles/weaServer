@@ -23,7 +23,7 @@ api.get("/get/:city/:geo2", (req, res) => {
       headers: {
          "content-type": "application/octet-stream",
          "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
-         "x-rapidapi-key": "9eb7e726ebmsh421b9062a5f0fcdp1792acjsn5b07d0e7ac3f",
+         "x-rapidapi-key": c.global.wb_api_key,
       },
       params: {
          lang: "en",

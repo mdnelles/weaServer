@@ -115,12 +115,14 @@ const initSteps = async function (refer) {
 const doTwoLetterCities = function (alpha, i1, i2, refer) {
    db.sequelize
       .query(
-         `SELECT ANY_VALUE(wb_cities.city_id) as id, 
-         ANY_VALUE(wb_cities.city_ascii) as c,
-         ANY_VALUE(wb_cities.state_name_ascii) as p, 
-         ANY_VALUE(wb_cities.country_code) as o
-         FROM wb_cities
-           WHERE wb_cities.city_ascii like  '${alpha[i1]}${alpha[i2]}%'  ORDER BY o,p,c ASC`,
+         `SELECT c.city_id id, 
+         c.city_ascii ci,
+         s.state_name_ascii ps, 
+         c.country_code co
+  FROM wb_cities AS c JOIN wb_states AS s 
+  ON s.state_code=c.state_code AND s.country_code = c.country_code
+  WHERE c.city_ascii like  '${alpha[i1]}${alpha[i2]}%' 
+  ORDER BY co, ps, ci`,
          {
             type: Sequelize.QueryTypes.SELECT,
          }
@@ -148,7 +150,7 @@ const doTwoLetterCities = function (alpha, i1, i2, refer) {
                }
             });*/
             let path,
-               fileName = alpha[i1] + alpha[i2] + ".txt";
+               fileName = alpha[i1] + alpha[i2] + ".json";
 
             // establish file path based on weather or not it is production or build
             refer.includes("localhost:")

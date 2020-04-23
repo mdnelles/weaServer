@@ -9,6 +9,8 @@ const express = require("express"),
    uuid = require("uuid"),
    Sequelize = require("sequelize"),
    db = require("../database/db"),
+   { parse, stringify } = require("flatted/cjs"),
+   c = require("../config/config.json"),
    rf = require("./RoutFuctions");
 
 cities.use(cors());
@@ -127,17 +129,50 @@ cities.post("/edit_city", rf.verifyToken, (req, res) => {
    }
 });
 
-cities.post("/get_api", rf.verifyToken, (req, res) => {
-   let cityID = req.body.data.id;
-   console.log(cityID);
-   ApiData.findAll({ where: { city_id: cityID } })
+cities.post("/get_api", rf.verifyRefer, (req, res) => {
+   // currently not running token through middle w
+   //city_id,city,province,country,token
+   let city_id = req.body.city_id;
+   let lat = req.body.lat;
+   let lon = req.body.lon;
+   ApiData.findAll({ where: { city_id: city_id } })
       .then((aData) => {
          console.log("** length = " + aData.length);
          if (aData.length !== 0) {
             let j = JSON.parse(aData.stringified);
             res.send(aData);
          } else {
-            res.send("need to make API call");
+            console.log(
+               "need to make and API Call lat/lon = " + lat + " - " + lon
+            );
+            // api call
+            axios({
+               method: "GET",
+               url: "https://weatherbit-v1-mashape.p.rapidapi.com/current",
+               headers: {
+                  "content-type": "application/octet-stream",
+                  "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
+                  "x-rapidapi-key": c.global.wb_api_key,
+               },
+               params: {
+                  lang: "en",
+                  lon: lon,
+                  lat: lat,
+               },
+            })
+               .then((response) => {
+                  //console.log(response)
+                  let sr = stringify(response);
+                  ApiData.create({
+                     city_id: city_id,
+                     tdate: "12345",
+                     stringified: sr,
+                  });
+                  res.send("1");
+               })
+               .catch((error) => {
+                  console.log(error);
+               });
          }
 
          //res.send(cities);
