@@ -4,7 +4,12 @@ const db = require("../database/db.js");
 module.exports = db.sequelize.define(
    "api_datas",
    {
-      city_id: {
+      lat: {
+         type: Sequelize.STRING,
+         primaryKey: true,
+         allowNull: false,
+      },
+      lon: {
          type: Sequelize.STRING,
          primaryKey: true,
          allowNull: false,

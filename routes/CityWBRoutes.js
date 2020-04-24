@@ -6,6 +6,7 @@ const express = require("express"),
    ApiData = require("../models/ApiData"),
    Logfn = require("../components/Logger"),
    jwt = require("jsonwebtoken"),
+   unirest = require("unirest"),
    uuid = require("uuid"),
    Sequelize = require("sequelize"),
    db = require("../database/db"),
@@ -36,8 +37,8 @@ cities.post("/get_cities", rf.verifyToken, (req, res) => {
             req.headers.referer,
             tdate
          );
-         res.json({ error: "CityRoutes > get_cities error-> " + err });
-         console.log({ error: "CityRoutes > get_cities error-> " + err });
+         res.json({ error: "CityWBRoutes > get_cities error-> " + err });
+         console.log({ error: "CityWBRoutes > get_cities error-> " + err });
       });
 });
 
@@ -65,8 +66,8 @@ cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
             req.headers.referer,
             tdate
          );
-         res.json({ error: "CityRoutes > get_cities error-> " + err });
-         console.log({ error: "CityRoutes > get_cities error-> " + err });
+         res.json({ error: "CityWBRoutes > get_cities error-> " + err });
+         console.log({ error: "CityWBRoutes > get_cities error-> " + err });
       });
 });
 
@@ -129,53 +130,60 @@ cities.post("/edit_city", rf.verifyToken, (req, res) => {
    }
 });
 
-cities.post("/get_api", rf.verifyRefer, (req, res) => {
-   // currently not running token through middle w
-   //city_id,city,province,country,token
-   let city_id = req.body.city_id;
+cities.post("/get_data_from_rapidapi", rf.verifyRefer, (req, res) => {
+   // RAPID API limit 150 per day WEATHERBIT 150/per day
    let lat = req.body.lat;
    let lon = req.body.lon;
-   ApiData.findAll({ where: { city_id: city_id } })
+
+   ApiData.findAll({ where: { lon: lon, lat: lat } })
       .then((aData) => {
          console.log("** length = " + aData.length);
          if (aData.length !== 0) {
-            let j = JSON.parse(aData.stringified);
-            res.send(aData);
+            //let j = JSON.parse(aData.stringified);
+            console.log(aData);
+            res.send(aData[0].stringified);
          } else {
-            console.log(
-               "need to make and API Call lat/lon = " + lat + " - " + lon
-            );
+            console.log("API Call lat/lon = " + lat + " - " + lon);
             // api call
-            axios({
-               method: "GET",
-               url: "https://weatherbit-v1-mashape.p.rapidapi.com/current",
-               headers: {
-                  "content-type": "application/octet-stream",
-                  "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
-                  "x-rapidapi-key": c.global.wb_api_key,
-               },
-               params: {
-                  lang: "en",
-                  lon: lon,
-                  lat: lat,
-               },
-            })
-               .then((response) => {
-                  //console.log(response)
-                  let sr = stringify(response);
-                  ApiData.create({
-                     city_id: city_id,
-                     tdate: "12345",
-                     stringified: sr,
-                  });
-                  res.send("1");
-               })
-               .catch((error) => {
-                  console.log(error);
-               });
-         }
+            var request = unirest(
+               "GET",
+               "https://weatherbit-v1-mashape.p.rapidapi.com/current"
+            );
 
-         //res.send(cities);
+            request.query({
+               lang: "en",
+               lon,
+               lat,
+            });
+
+            request.headers({
+               "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
+               "x-rapidapi-key": c.global.rapidApiKey,
+            });
+
+            request.end(function (response) {
+               if (response.error) throw new Error(response.error);
+
+               let date = response.body.data[0].ts;
+               let stringified = stringify(response.body.data[0]);
+               ApiData.create({
+                  tdate,
+                  stringified,
+                  lon,
+                  lat,
+               }).catch((err) => {
+                  res.send(
+                     `Err: INSERT failed CityWBRoutes.get_data_from_rapidapi: ` +
+                        err
+                  ).end();
+                  console.log(
+                     `Err: INSERT failed CityWBRoutes.get_data_from_rapidapi: ` +
+                        err
+                  );
+               });
+               res.send(stringified);
+            });
+         }
       })
       .catch((err) => {
          Logfn.log2db(
@@ -188,33 +196,77 @@ cities.post("/get_api", rf.verifyRefer, (req, res) => {
             req.headers.referer,
             tdate
          );
-         res.json({ error: "CityRoutes > get_cities error-> " + err });
-         console.log({ error: "CityRoutes > get_cities error-> " + err });
+         res.json({ error: "CityWBRoutes.get_data_from_rapidapi " + err });
+         console.log({ error: "CityWBRoutes.get_data_from_rapidapi" + err });
       });
 });
 
-const apiFetch = (lon, lat) => {
-   axios({
-      method: "GET",
-      url: "https://dark-sky.p.rapidapi.com/" + lon + "," + lat,
-      headers: {
-         "content-type": "application/octet-stream",
-         "x-rapidapi-host": "dark-sky.p.rapidapi.com",
-         "x-rapidapi-key": c.global.darkAPIKey,
-      },
-      params: {
-         lang: "en",
-         units: "auto",
-      },
-   })
-      .then((response) => {
-         res.send(stringify(response));
-         console.log(response);
+cities.post("/get_data_from_weatherbit", rf.verifyRefer, (req, res) => {
+   // RAPID API limit 150 per day WEATHERBIT 150/per day
+   let lat = req.body.lat;
+   let lon = req.body.lon;
+
+   ApiData.findAll({ where: { lon: lon, lat: lat } })
+      .then((aData) => {
+         console.log("** length = " + aData.length);
+         if (aData.length !== 0) {
+            //let j = JSON.parse(aData.stringified);
+            console.log(aData);
+            res.send(aData[0].stringified);
+         } else {
+            let rest = `lat=${lat}&lon=${lon}&key=${c.global.weatherbitApiKey}`;
+            // api call
+            var request = unirest(
+               "GET",
+               "https://api.weatherbit.io/v2.0/current?" + rest
+            );
+
+            request.headers({
+               "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
+               "x-rapidapi-key": c.global.rapidApiKey,
+            });
+
+            request.end(function (response) {
+               if (response.error) {
+                  res.send("ERR: get_data_from_weatherbit: " + response.error);
+                  throw new Error(response.error);
+               }
+
+               let date = response.body.data[0].ts;
+               let stringified = stringify(response.body.data[0]);
+               ApiData.create({
+                  tdate,
+                  stringified,
+                  lon,
+                  lat,
+               }).catch((err) => {
+                  res.send(
+                     `Err: INSERT failed CityWBRoutes.get_data_from_weatherbit: ` +
+                        err
+                  ).end();
+                  console.log(
+                     `Err: INSERT failed CityWBRoutes.get_data_from_weatherbit: ` +
+                        err
+                  );
+               });
+               res.send(stringified);
+            });
+         }
       })
-      .catch((error) => {
-         res.send(stringify(error));
-         console.log(error);
+      .catch((err) => {
+         Logfn.log2db(
+            500,
+            fileName,
+            "could not get cities",
+            "catch err",
+            err,
+            ip,
+            req.headers.referer,
+            tdate
+         );
+         res.json({ error: "CityWBRoutes.get_data_from_rapidapi " + err });
+         console.log({ error: "CityWBRoutes.get_data_from_rapidapi" + err });
       });
-};
+});
 
 module.exports = cities;
