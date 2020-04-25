@@ -22,7 +22,17 @@ let fileName = __filename.split(/[\\/]/).pop();
 
 cities.post("/get_cities", rf.verifyToken, (req, res) => {
    // display path of file
-   CitiesWB.findAll()
+   CitiesWB.findAll({
+      attributes: [
+         "city_id",
+         "city_ascii",
+         "state_name_ascii",
+         "country_full",
+         "lat",
+         "lon",
+         "population",
+      ],
+   })
       .then((cities) => {
          res.send(cities);
       })
@@ -164,24 +174,23 @@ cities.post("/get_data_from_rapidapi", rf.verifyRefer, (req, res) => {
             request.end(function (response) {
                if (response.error) throw new Error(response.error);
 
-               let date = response.body.data[0].ts;
+               let tdate = response.body.data[0].ts;
                let stringified = stringify(response.body.data[0]);
                ApiData.create({
                   tdate,
                   stringified,
                   lon,
                   lat,
-               }).catch((err) => {
-                  res.send(
-                     `Err: INSERT failed CityWBRoutes.get_data_from_rapidapi: ` +
-                        err
-                  ).end();
-                  console.log(
-                     `Err: INSERT failed CityWBRoutes.get_data_from_rapidapi: ` +
-                        err
-                  );
-               });
-               res.send(stringified);
+               })
+                  .catch((err) => {
+                     console.log(
+                        `Err: INSERT failed CityWBRoutes.get_data_from_rapidapi: ` +
+                           err
+                     );
+                  })
+                  .then(() => {
+                     res.send(stringified);
+                  });
             });
          }
       })

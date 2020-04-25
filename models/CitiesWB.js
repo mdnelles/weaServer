@@ -49,6 +49,11 @@ module.exports = db.sequelize.define(
          defaultValue: "na",
          allowNull: false,
       },
+      population: {
+         type: Sequelize.STRING,
+         defaultValue: "na",
+         allowNull: false,
+      },
    },
    {
       timestamps: false,
