@@ -7,7 +7,8 @@ const express = require("express"),
    StatesWB = require("../models/StatesWB"),
    rf = require("./RoutFuctions"),
    uuid = require("uuid"),
-   Sequelize = require("sequelize");
+   { parse, stringify } = require("flatted/cjs");
+Sequelize = require("sequelize");
 //const CircularJSON = require('flatted');
 
 importcsv.use(cors());
@@ -30,7 +31,8 @@ importcsv.get("/csv", (req, res) => {
          stream
             .on("data", function (line, err) {
                if (line !== undefined) {
-                  sql = "INSERT INTO cities VALUES (" + line.toString() + ");";
+                  sql =
+                     "INSERT INTO citiesOLD VALUES (" + line.toString() + ");";
                   if (first) console.log(sql);
                   first = false;
                   db.sequelize.query(sql);
@@ -274,5 +276,40 @@ importcsv.get("/csv_states_wb", (req, res) => {
          res.send("ok");
       });
 });
+
+importcsv.get("/pop_numeric", (req, res) => {
+   let sql = "",
+      population;
+   db.sequelize
+      .query(`SELECT id,population,city_ascii FROM citiesOLD`)
+      .then((data) => {
+         //console.log(data);
+         console.log("step 1");
+         proc(data).then((sql) => {
+            res.send(sql);
+            //res.send("done");
+            //db.sequelize.query(sql);
+            console.log("step 3");
+         });
+      });
+});
+
+const proc = (data) => {
+   return new Promise((resolve) => {
+      console.log("step 2");
+      var sql = "",
+         city = "";
+      //console.log(data[0].slice(0, 3));
+      data[0].forEach((e, i) => {
+         population = parseInt(e.population);
+         if (population > 1) {
+            city = e.city_ascii.toString().replace(/'/g, "'");
+            sql += `
+            UPDATE wb_cities SET population = ${population} WHERE city_ascii = "${city}" LIMIT 1; <br>`;
+         }
+      });
+      resolve(sql);
+   });
+};
 
 module.exports = importcsv;
