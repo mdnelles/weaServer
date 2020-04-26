@@ -15,15 +15,16 @@ api.post("/get_from_db", rf.verifyRefer, (req, res) => {
    db.sequelize
       .query(
          `SELECT 
-      a.city_id AS cid,
+         a.lon AS lon,
+         a.lat AS lat,
       a.tdate as date,
       c.city_name AS ci,
       c.state_name_ascii AS ps,
       c.country_code AS co
      FROM weather.api_datas AS a
      LEFT JOIN wb_cities AS c ON
-     a.city_id = c.city_id
-     ORDER BY a.tdate ASC`
+     a.lon = c.lon AND a.lat = c.lat
+     ORDER BY a.tdate DESC`
       )
       .then((data) => {
          res.json(data);
@@ -44,11 +45,14 @@ api.post("/get_from_db", rf.verifyRefer, (req, res) => {
       });
 });
 
-api.post("/get_city_json", rf.verifyRefer, (req, res) => {
-   console.log("in here get city json");
-   ApiData.findOne({ where: { city_id: req.body.id } }, { limit: 1 })
+api.post("/get_json", rf.verifyRefer, (req, res) => {
+   ApiData.findOne(
+      {
+         where: { tdate: req.body.tdate, lon: req.body.lon, lat: req.body.lat },
+      },
+      { limit: 1 }
+   )
       .then((data) => {
-         console.log(data);
          res.json(data);
       })
       .catch((err) => {
