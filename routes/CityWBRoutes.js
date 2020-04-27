@@ -240,7 +240,7 @@ cities.post("/get_data_from_weatherbit", rf.verifyRefer, (req, res) => {
                   throw new Error(response.error);
                }
 
-               let date = response.body.data[0].ts;
+               let tdate = response.body.data[0].ts;
                let stringified = stringify(response.body.data[0]);
                ApiData.create({
                   tdate,
@@ -251,7 +251,7 @@ cities.post("/get_data_from_weatherbit", rf.verifyRefer, (req, res) => {
                   res.send(
                      `Err: INSERT failed CityWBRoutes.get_data_from_weatherbit: ` +
                         err
-                  ).end();
+                  );
                   console.log(
                      `Err: INSERT failed CityWBRoutes.get_data_from_weatherbit: ` +
                         err
@@ -291,7 +291,7 @@ cities.post("/get_data_live", rf.verifyRefer, (req, res) => {
                console.log("** length = " + aData.length);
                if (aData.length !== 0) {
                   //let j = JSON.parse(aData.stringified);
-                  console.log(aData);
+
                   res.send(aData[0].stringified);
                } else {
                   let rest = `lat=${lat}&lon=${lon}&key=${c.global.weatherbitApiKey}`;
@@ -312,7 +312,7 @@ cities.post("/get_data_live", rf.verifyRefer, (req, res) => {
                         throw new Error(response.error);
                      }
 
-                     let date = response.body.data[0].ts;
+                     let tdate = response.body.data[0].ts;
                      let stringified = stringify(response.body.data[0]);
                      ApiData.create({
                         tdate,
@@ -323,12 +323,13 @@ cities.post("/get_data_live", rf.verifyRefer, (req, res) => {
                         res.send(
                            `Err: INSERT failed CityWBRoutes.get_data_live: ` +
                               err
-                        ).end();
+                        );
                         console.log(
                            `Err: INSERT failed CityWBRoutes.get_data_live: ` +
                               err
                         );
                      });
+                     //console.log(stringified);
                      res.send(stringified);
                   });
                }
