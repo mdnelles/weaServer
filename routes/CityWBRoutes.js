@@ -1,10 +1,9 @@
 const express = require("express"),
    cities = express.Router(),
    cors = require("cors"),
-   axios = require("axios"),
-   CitiesWB = require("../models/CitiesWB"),
    ApiData = require("../models/ApiData"),
    Logfn = require("../components/Logger"),
+   CitiesWB = require("../models/CitiesWB"),
    jwt = require("jsonwebtoken"),
    unirest = require("unirest"),
    uuid = require("uuid"),
@@ -275,6 +274,88 @@ cities.post("/get_data_from_weatherbit", rf.verifyRefer, (req, res) => {
          );
          res.json({ error: "CityWBRoutes.get_data_from_rapidapi " + err });
          console.log({ error: "CityWBRoutes.get_data_from_rapidapi" + err });
+      });
+});
+
+cities.post("/get_data_live", rf.verifyRefer, (req, res) => {
+   // RAPID API limit 150 per day WEATHERBIT 150/per day
+   let city_id = req.body.city_id;
+
+   CitiesWB.findOne({ where: { city_id: city_id } })
+      .then((data) => {
+         let lon = data.lon;
+         let lat = data.lat;
+         ///
+         ApiData.findAll({ where: { lon: lon, lat: lat } })
+            .then((aData) => {
+               console.log("** length = " + aData.length);
+               if (aData.length !== 0) {
+                  //let j = JSON.parse(aData.stringified);
+                  console.log(aData);
+                  res.send(aData[0].stringified);
+               } else {
+                  let rest = `lat=${lat}&lon=${lon}&key=${c.global.weatherbitApiKey}`;
+                  // api call
+                  var request = unirest(
+                     "GET",
+                     "https://api.weatherbit.io/v2.0/current?" + rest
+                  );
+
+                  request.headers({
+                     "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
+                     "x-rapidapi-key": c.global.rapidApiKey,
+                  });
+
+                  request.end(function (response) {
+                     if (response.error) {
+                        res.send("ERR: get_data_live: " + response.error);
+                        throw new Error(response.error);
+                     }
+
+                     let date = response.body.data[0].ts;
+                     let stringified = stringify(response.body.data[0]);
+                     ApiData.create({
+                        tdate,
+                        stringified,
+                        lon,
+                        lat,
+                     }).catch((err) => {
+                        res.send(
+                           `Err: INSERT failed CityWBRoutes.get_data_live: ` +
+                              err
+                        ).end();
+                        console.log(
+                           `Err: INSERT failed CityWBRoutes.get_data_live: ` +
+                              err
+                        );
+                     });
+                     res.send(stringified);
+                  });
+               }
+            })
+            .catch((err) => {
+               Logfn.log2db(
+                  500,
+                  fileName,
+                  "could not get cities",
+                  "catch err",
+                  err,
+                  ip,
+                  req.headers.referer,
+                  tdate
+               );
+               res.json({
+                  error: "CityWBRoutes.get_data_from_rapidapi " + err,
+               });
+               console.log({
+                  error: "CityWBRoutes.get_data_from_rapidapi" + err,
+               });
+            });
+         ///
+      })
+      .catch((err) => {
+         res.send("could not find city with id " + city_id);
+         console.log("Err: CityWBRoutes.gat_data_live" + err);
       });
 });
 
