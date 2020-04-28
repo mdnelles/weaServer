@@ -2,6 +2,7 @@ const express = require("express"),
    cities = express.Router(),
    cors = require("cors"),
    ApiData = require("../models/ApiData"),
+   ApiData16Day = require("../models/ApiData16Day"),
    Logfn = require("../components/Logger"),
    CitiesWB = require("../models/CitiesWB"),
    jwt = require("jsonwebtoken"),
@@ -357,6 +358,84 @@ cities.post("/get_data_live", rf.verifyRefer, (req, res) => {
       .catch((err) => {
          res.send("could not find city with id " + city_id);
          console.log("Err: CityWBRoutes.gat_data_live" + err);
+      });
+});
+
+cities.post("/get_data_16", rf.verifyRefer, (req, res) => {
+   // RAPID API limit 150 per day WEATHERBIT 150/per day
+   let city_id = req.body.city_id;
+
+   CitiesWB.findOne({ where: { city_id: city_id } })
+      .then((data) => {
+         let lon = data.lon;
+         let lat = data.lat;
+         ///
+         ApiData16Day.findAll({ where: { lon: lon, lat: lat } })
+            .then((aData) => {
+               if (aData.length !== 0) {
+                  console.log(" >> No API call - found in DB");
+                  //let j = JSON.parse(aData.stringified);
+                  res.send(aData);
+               } else {
+                  console.log(">>made API Call");
+                  let rest = `days=14&lat=${lat}&lon=${lon}&key=${c.global.weatherbitApiKey}`;
+                  // api call
+                  var request = unirest(
+                     "GET",
+                     "https://api.weatherbit.io/v2.0/forecast/daily?" + rest
+                  );
+
+                  request.headers({
+                     "x-rapidapi-host": "weatherbit-v1-mashape.p.rapidapi.com",
+                     "x-rapidapi-key": c.global.rapidApiKey,
+                  });
+
+                  request.end(function (response) {
+                     if (response.error) {
+                        res.send("ERR: get_data_16: " + response.error);
+                        throw new Error(response.error);
+                     }
+
+                     let tdate = response.body.data[1].ts;
+                     let stringified = stringify(response.body.data);
+                     ApiData16Day.create({
+                        tdate,
+                        stringified,
+                        lon,
+                        lat,
+                     }).catch((err) => {
+                        console.log(
+                           `Err: INSERT failed CityWBRoutes.get_data_16: ` + err
+                        );
+                     });
+                     //console.log(stringified);
+                     res.send(stringified);
+                  });
+               }
+            })
+            .catch((err) => {
+               Logfn.log2db(
+                  500,
+                  fileName,
+                  "could not get cities",
+                  "catch err",
+                  err,
+                  ip,
+                  req.headers.referer,
+                  tdate
+               );
+               res.json({
+                  error: "CityWBRoutes.get_data_16 " + err,
+               });
+               console.log({
+                  error: "CityWBRoutes.get_data_16" + err,
+               });
+            });
+         ///
+      })
+      .catch((err) => {
+         res.send("could not find city with id: " + city_id);
+         console.log("Err: CityWBRoutes.gat_data_16: " + err);
       });
 });
 
