@@ -378,7 +378,7 @@ cities.post("/get_data_16", rf.verifyRefer, (req, res) => {
                   res.send(aData);
                } else {
                   console.log(">>made API Call");
-                  let rest = `days=14&lat=${lat}&lon=${lon}&key=${c.global.weatherbitApiKey}`;
+                  let rest = `days=15&lat=${lat}&lon=${lon}&key=${c.global.weatherbitApiKey}`;
                   // api call
                   var request = unirest(
                      "GET",
