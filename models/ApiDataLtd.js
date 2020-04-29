@@ -24,6 +24,11 @@ module.exports = db.sequelize.define(
          defaultValue: "na",
          allowNull: true,
       },
+      uuid: {
+         type: Sequelize.STRING,
+         defaultValue: "na",
+         allowNull: true,
+      },
    },
    {
       timestamps: false,

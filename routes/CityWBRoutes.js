@@ -2,7 +2,7 @@ const express = require("express"),
    cities = express.Router(),
    cors = require("cors"),
    ApiData = require("../models/ApiData"),
-   ApiData16Day = require("../models/ApiData16Day"),
+   ApiData16Day = require("../models/ApiDataLtd"),
    Logfn = require("../components/Logger"),
    CitiesWB = require("../models/CitiesWB"),
    jwt = require("jsonwebtoken"),
@@ -392,20 +392,23 @@ cities.post("/get_data_16", rf.verifyRefer, (req, res) => {
 
                   request.end(function (response) {
                      if (response.error) {
-                        res.send("ERR: get_data_16: " + response.error);
+                        res.send("ERR: get_data_16a: " + response.error);
                         throw new Error(response.error);
                      }
 
                      let tdate = response.body.data[1].ts;
+                     console.log("tdate: " + tdate);
                      let stringified = stringify(response.body.data);
                      ApiData16Day.create({
-                        tdate,
-                        stringified,
-                        lon,
-                        lat,
+                        tdate: tdate,
+                        stringfield: stringified,
+                        lon: lon,
+                        lat: lat,
+                        uuid: uuid.v1(),
                      }).catch((err) => {
                         console.log(
-                           `Err: INSERT failed CityWBRoutes.get_data_16: ` + err
+                           `Err: INSERT failed CityWBRoutes.get_data_16b: ` +
+                              err
                         );
                      });
                      //console.log(stringified);
@@ -428,7 +431,7 @@ cities.post("/get_data_16", rf.verifyRefer, (req, res) => {
                   error: "CityWBRoutes.get_data_16 " + err,
                });
                console.log({
-                  error: "CityWBRoutes.get_data_16" + err,
+                  error: "CityWBRoutes.get_data_16c" + err,
                });
             });
          ///
