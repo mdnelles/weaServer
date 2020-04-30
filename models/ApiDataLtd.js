@@ -21,7 +21,6 @@ module.exports = db.sequelize.define(
       },
       stringified: {
          type: Sequelize.STRING,
-         defaultValue: "na",
          allowNull: true,
       },
       uuid: {

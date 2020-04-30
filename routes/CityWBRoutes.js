@@ -401,7 +401,7 @@ cities.post("/get_data_16", rf.verifyRefer, (req, res) => {
                      let stringified = stringify(response.body.data);
                      ApiData16Day.create({
                         tdate: tdate,
-                        stringfield: stringified,
+                        stringfied: stringified,
                         lon: lon,
                         lat: lat,
                         uuid: uuid.v1(),
