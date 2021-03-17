@@ -8,7 +8,6 @@ const express = require("express"),
    Cities = require("../models/Cities"),
    Logfn = require("../components/Logger"),
    rf = require("./RoutFuctions");
-//const CircularJSON = require('flatted');
 
 utils.use(cors());
 
@@ -130,25 +129,8 @@ const doTwoLetterCities = function (alpha, i1, i2, refer) {
       .then((data) => {
          // need to remove accents from letters
 
-         if (data !== undefined || data.length > 0) {
-            /*
-            data.forEach((e, i) => {
-               if (data[i].c !== undefined) {
-                  data[i].c = data[i].c
-                     .normalize("NFD")
-                     .replace(/[\u0300-\u036f]/g, "");
-               }
-               if (data[i].p !== undefined) {
-                  data[i].p = data[i].p
-                     .normalize("NFD")
-                     .replace(/[\u0300-\u036f]/g, "");
-               }
-               if (data[i].o !== undefined) {
-                  data[i].o = data[i].o
-                     .normalize("NFD")
-                     .replace(/[\u0300-\u036f]/g, "");
-               }
-            });*/
+         if (!data || data.length > 0) {
+          
             let path,
                fileName = alpha[i1] + alpha[i2] + ".json";
 
