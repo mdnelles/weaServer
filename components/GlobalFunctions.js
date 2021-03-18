@@ -25,7 +25,7 @@ exports.extMailer(to,sub,msg){
      
          // setup email data with unicode symbols
          let mailOptions = {
-             from: '"Nelles.io Server (do not reply)" <donotreply@nelles.io>', // sender address
+             from: '"Web Servre Server (do not reply)" <donotreply@gmail.com>', // sender address
              to: to, // list of receivers
              subject: sub, // Subject line
              text: msg, // plain text body
