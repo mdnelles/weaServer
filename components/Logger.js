@@ -53,3 +53,6 @@ exports.get_date = () => {
       d.getSeconds();
    return tdate;
 };
+export.exempt = (varPnter) => {
+ varPnter.flag = false;  
+}
