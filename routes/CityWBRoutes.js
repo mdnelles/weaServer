@@ -372,7 +372,7 @@ cities.post("/get_data_16", rf.verifyRefer, (req, res) => {
          ///
          ApiData16Day.findAll({ where: { lon: lon, lat: lat } })
             .then((aData) => {
-               if (aData.length !== 0) {
+               if (!!aData && aData.length !== 0) {
                   console.log(" >> No API call - found in DB");
                   //let j = JSON.parse(aData.stringified);
                   res.send(aData);
@@ -411,7 +411,6 @@ cities.post("/get_data_16", rf.verifyRefer, (req, res) => {
                               err
                         );
                      });
-                     //console.log(stringified);
                      res.send(stringified);
                   });
                }
