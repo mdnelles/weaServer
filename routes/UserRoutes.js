@@ -7,7 +7,6 @@ const express = require("express"),
    User = require("../models/User"),
    Logfn = require("../components/Logger"),
    rf = require("./RoutFuctions");
-//const CircularJSON = require('flatted');
 
 users.use(cors());
 
@@ -23,8 +22,6 @@ users.post("/login", (req, res) => {
       },
    })
       .then((user) => {
-         //console.log('user found:');
-         //console.log(user);
          if (user) {
             // user exists in database now try to match password
 
@@ -84,7 +81,6 @@ users.post("/login", (req, res) => {
 
 users.post("/islogged", rf.verifyToken, (req, res) => {
    res.status(200).json(true).end();
-   // if false rf.verifyToken will send response -> res.status(403)
 });
 
 users.post("/getusers", rf.verifyToken, (req, res) => {
@@ -101,7 +97,7 @@ users.post("/getusers", rf.verifyToken, (req, res) => {
          Logfn.log2db(
             500,
             fileName,
-            "getusers",
+            "getusers err",
             "catch",
             err,
             ip,
