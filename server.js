@@ -1,6 +1,6 @@
-const express = require("express"),
-   cors = require("cors"),
-   bodyParser = require("body-parser"),
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
    cookieParser = require("cookie-parser"),
    session = require("express-session"),
    app = express(),
