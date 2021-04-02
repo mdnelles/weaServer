@@ -1,10 +1,5 @@
 /*
 
-
-
-
-
-
 !!!!!!!
 
 
@@ -39,7 +34,6 @@ let tdate = Logfn.get_date();
 let fileName = __filename.split(/[\\/]/).pop();
 
 cities.post("/get_cities", rf.verifyToken, (req, res) => {
-   // display path of file
    Cities.findAll()
       .then((cities) => {
          res.send(cities);
@@ -91,7 +85,6 @@ cities.post("/get_cities_by_country", rf.verifyToken, (req, res) => {
 
 cities.post("/add_city", rf.verifyToken, (req, res) => {
    let refer = req.headers.referer;
-   // jwt.verify(token, process.env.SECRET_KEY, (err) => {
    decoded = jwt.verify(req.body.token, process.env.SECRET_KEY);
 
    if (
@@ -160,8 +153,6 @@ cities.post("/get_api", rf.verifyToken, (req, res) => {
          } else {
             res.send("need to make API call");
          }
-
-         //res.send(cities);
       })
       .catch((err) => {
          Logfn.log2db(
@@ -199,7 +190,7 @@ const apiFetch = (lon, lat) => {
       })
       .catch((error) => {
          res.send(stringify(error));
-         console.log(error);
+         console.log("Err:" + error);
       });
 };
 
