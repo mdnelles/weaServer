@@ -10,9 +10,10 @@ const express = require('express'),
 
 countries.use(cors());
 
-let ip = '0.0.0.0'; // install ip tracker
-let tdate = Logfn.get_date();
-let fileName = __filename.split(/[\\/]/).pop();
+const ip = '0.0.0.0'; // install ip tracker
+const tdate = Logfn.get_date();
+const fileName = __filename.split(/[\\/]/).pop();
+
 
 countries.post('/get_countries', rf.verifyToken, (req, res) => {
    // display path of file
