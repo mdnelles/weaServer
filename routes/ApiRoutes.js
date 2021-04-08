@@ -56,7 +56,7 @@ api.post("/get_json", rf.verifyRefer, (req, res) => {
          res.json(data);
       })
       .catch((err) => {
-         console.log("ERR @ ApiRoutes.get_city_json: " + err);
+         console.log("ERR @ ApiRoutes.get_json: " + err);
          Logfn.log2db(
             500,
             fileName,
