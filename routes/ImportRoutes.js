@@ -13,11 +13,8 @@ Sequelize = require("sequelize");
 
 importcsv.use(cors());
 
-//importcsv.post('/csv', rf.verifyToken, (req, res) => {
 importcsv.get("/csv", (req, res) => {
-   ////////
 
-   ////////
    function processFile() {
       return new Promise((resolve) => {
          let first = true;
@@ -30,7 +27,7 @@ importcsv.get("/csv", (req, res) => {
 
          stream
             .on("data", function (line, err) {
-               if (line !== undefined) {
+               if (!!line) {
                   sql =
                      "INSERT INTO citiesOLD VALUES (" + line.toString() + ");";
                   if (first) console.log(sql);
