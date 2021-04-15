@@ -24,6 +24,7 @@ const get_date = () => {
 let ip = "0.0.0.0";
 let tdate = get_date();
 let fileName = __filename.split(/[\\/]/).pop();
+const flag = false;
 
 const tokenTest = (token, res, jwt, caller, next) => {
    jwt.verify(token, process.env.SECRET_KEY, (err) => {
