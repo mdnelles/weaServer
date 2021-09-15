@@ -1,5 +1,5 @@
-const express = require("express"),
-   captcha = express.Router(),
+const express = require("express");
+const captcha = express.Router(),
    cors = require("cors"),
    c = require("../config/config.json");
 
