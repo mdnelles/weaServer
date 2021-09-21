@@ -2,6 +2,7 @@ const express = require("express");
 const captcha = express.Router();
 const cors = require("cors");
 const c = require("../config/config.json");
+const inv = 5;
 
 captcha.use(cors());
 
