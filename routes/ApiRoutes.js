@@ -1,5 +1,5 @@
-const express = require("express"),
-   cors = require("cors"),
+const express = require("express");
+const cors = require("cors"),
    db = require("../database/db"),
    api = express.Router(),
    c = require("../config/config.json"),
