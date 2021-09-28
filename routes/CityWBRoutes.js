@@ -1,7 +1,7 @@
 const express = require("express");
-const cities = express.Router(),
-   cors = require("cors"),
-   ApiData = require("../models/ApiData"),
+const cities = express.Router();
+const cors = require("cors");
+const ApiData = require("../models/ApiData"),
    ApiData16Day = require("../models/ApiDataLtd"),
    Logfn = require("../components/Logger"),
    CitiesWB = require("../models/CitiesWB"),
